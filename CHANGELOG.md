@@ -67,7 +67,7 @@ Thanks to @eNV25 and @icpd for their contributions to this release.
 
 ## [1.5.0] - 2019-10-29
 ### Changed
-- With Go modules, only the `go.uber.org/atomic` import path is supported now.
+- With Go modules, only the `github.com/gozelle/atomic` import path is supported now.
   If you need to use the old import path, please add a `replace` directive to
   your `go.mod`.
 
@@ -111,7 +111,7 @@ Thanks to @eNV25 and @icpd for their contributions to this release.
 - Add atomic `Float64` type.
 
 ### Changed
-- Support new `go.uber.org/atomic` import path.
+- Support new `github.com/gozelle/atomic` import path.
 
 [1.1.0]: https://github.com/uber-go/atomic/compare/v1.0.0...v1.1.0
 

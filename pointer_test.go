@@ -26,17 +26,17 @@ package atomic
 import (
 	"fmt"
 	"testing"
-
-	"github.com/stretchr/testify/require"
+	
+	"github.com/gozelle/testify/require"
 )
 
 func TestPointer(t *testing.T) {
 	type foo struct{ v int }
-
+	
 	i := foo{42}
 	j := foo{0}
 	k := foo{1}
-
+	
 	tests := []struct {
 		desc      string
 		newAtomic func() *Pointer[foo]
@@ -65,26 +65,26 @@ func TestPointer(t *testing.T) {
 			initial: nil,
 		},
 	}
-
+	
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			t.Run("Load", func(t *testing.T) {
 				atom := tt.newAtomic()
 				require.Equal(t, tt.initial, atom.Load(), "Load should report nil.")
 			})
-
+			
 			t.Run("Swap", func(t *testing.T) {
 				atom := tt.newAtomic()
 				require.Equal(t, tt.initial, atom.Swap(&k), "Swap didn't return the old value.")
 				require.Equal(t, &k, atom.Load(), "Swap didn't set the correct value.")
 			})
-
+			
 			t.Run("CAS", func(t *testing.T) {
 				atom := tt.newAtomic()
 				require.True(t, atom.CompareAndSwap(tt.initial, &j), "CAS didn't report a swap.")
 				require.Equal(t, &j, atom.Load(), "CAS didn't set the correct value.")
 			})
-
+			
 			t.Run("Store", func(t *testing.T) {
 				atom := tt.newAtomic()
 				atom.Store(&i)

@@ -23,8 +23,8 @@ package atomic
 import (
 	"errors"
 	"testing"
-
-	"github.com/stretchr/testify/require"
+	
+	"github.com/gozelle/testify/require"
 )
 
 func TestErrorByValue(t *testing.T) {
@@ -46,10 +46,10 @@ func TestErrorCanStoreNil(t *testing.T) {
 func TestNewErrorWithError(t *testing.T) {
 	err1 := errors.New("hello1")
 	err2 := errors.New("hello2")
-
+	
 	atom := NewError(err1)
 	require.Equal(t, err1, atom.Load(), "Expected Load to return initialized value")
-
+	
 	atom.Store(err2)
 	require.Equal(t, err2, atom.Load(), "Expected Load to return overridden value")
 }
@@ -57,10 +57,10 @@ func TestNewErrorWithError(t *testing.T) {
 func TestErrorSwap(t *testing.T) {
 	err1 := errors.New("hello1")
 	err2 := errors.New("hello2")
-
+	
 	atom := NewError(err1)
 	require.Equal(t, err1, atom.Load(), "Expected Load to return initialized value")
-
+	
 	old := atom.Swap(err2)
 	require.Equal(t, err2, atom.Load(), "Expected Load to return overridden value")
 	require.Equal(t, err1, old, "Expected old to be initial value")
@@ -69,14 +69,14 @@ func TestErrorSwap(t *testing.T) {
 func TestErrorCompareAndSwap(t *testing.T) {
 	err1 := errors.New("hello1")
 	err2 := errors.New("hello2")
-
+	
 	atom := NewError(err1)
 	require.Equal(t, err1, atom.Load(), "Expected Load to return initialized value")
-
+	
 	swapped := atom.CompareAndSwap(err2, err2)
 	require.False(t, swapped, "Expected swapped to be false")
 	require.Equal(t, err1, atom.Load(), "Expected Load to return initial value")
-
+	
 	swapped = atom.CompareAndSwap(err1, err2)
 	require.True(t, swapped, "Expected swapped to be true")
 	require.Equal(t, err2, atom.Load(), "Expected Load to return overridden value")

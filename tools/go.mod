@@ -1,4 +1,4 @@
-module go.uber.org/atomic/tools
+module github.com/gozelle/atomic/tools
 
 go 1.18
 

@@ -13,3 +13,4 @@ lint.log
 
 # Output of fossa analyzer
 /fossa
+.idea

@@ -24,9 +24,9 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	
+	"github.com/gozelle/testify/assert"
+	"github.com/gozelle/testify/require"
 )
 
 func TestStringNoInitialValue(t *testing.T) {
@@ -37,67 +37,67 @@ func TestStringNoInitialValue(t *testing.T) {
 func TestString(t *testing.T) {
 	atom := NewString("")
 	require.Equal(t, "", atom.Load(), "Expected Load to return initialized value")
-
+	
 	atom.Store("abc")
 	require.Equal(t, "abc", atom.Load(), "Unexpected value after Store")
-
+	
 	atom = NewString("bcd")
 	require.Equal(t, "bcd", atom.Load(), "Expected Load to return initialized value")
-
+	
 	t.Run("JSON/Marshal", func(t *testing.T) {
 		bytes, err := json.Marshal(atom)
 		require.NoError(t, err, "json.Marshal errored unexpectedly.")
 		require.Equal(t, []byte(`"bcd"`), bytes, "json.Marshal encoded the wrong bytes.")
 	})
-
+	
 	t.Run("JSON/Unmarshal", func(t *testing.T) {
 		err := json.Unmarshal([]byte(`"abc"`), &atom)
 		require.NoError(t, err, "json.Unmarshal errored unexpectedly.")
 		require.Equal(t, "abc", atom.Load(), "json.Unmarshal didn't set the correct value.")
 	})
-
+	
 	t.Run("JSON/Unmarshal/Error", func(t *testing.T) {
 		err := json.Unmarshal([]byte("42"), &atom)
 		require.Error(t, err, "json.Unmarshal didn't error as expected.")
 		assertErrorJSONUnmarshalType(t, err,
 			"json.Unmarshal failed with unexpected error %v, want UnmarshalTypeError.", err)
 	})
-
+	
 	atom = NewString("foo")
-
+	
 	t.Run("XML/Marshal", func(t *testing.T) {
 		bytes, err := xml.Marshal(atom)
 		require.NoError(t, err, "xml.Marshal errored unexpectedly.")
 		require.Equal(t, []byte("<String>foo</String>"), bytes, "xml.Marshal encoded the wrong bytes.")
 	})
-
+	
 	t.Run("XML/Unmarshal", func(t *testing.T) {
 		err := xml.Unmarshal([]byte("<String>bar</String>"), &atom)
 		require.NoError(t, err, "xml.Unmarshal errored unexpectedly.")
 		require.Equal(t, "bar", atom.Load(), "xml.Unmarshal didn't set the correct value.")
 	})
-
+	
 	t.Run("String", func(t *testing.T) {
 		atom := NewString("foo")
 		assert.Equal(t, "foo", atom.String(),
 			"String() returned an unexpected value.")
 	})
-
+	
 	t.Run("CompareAndSwap", func(t *testing.T) {
 		atom := NewString("foo")
-
+		
 		swapped := atom.CompareAndSwap("bar", "bar")
 		require.False(t, swapped, "swapped isn't false")
 		require.Equal(t, atom.Load(), "foo", "Load returned wrong value")
-
+		
 		swapped = atom.CompareAndSwap("foo", "bar")
 		require.True(t, swapped, "swapped isn't true")
 		require.Equal(t, atom.Load(), "bar", "Load returned wrong value")
 	})
-
+	
 	t.Run("Swap", func(t *testing.T) {
 		atom := NewString("foo")
-
+		
 		old := atom.Swap("bar")
 		require.Equal(t, old, "foo", "Swap returned wrong value")
 		require.Equal(t, atom.Load(), "bar", "Load returned wrong value")

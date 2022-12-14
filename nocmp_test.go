@@ -27,9 +27,9 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	
+	"github.com/gozelle/testify/assert"
+	"github.com/gozelle/testify/require"
 )
 
 func TestNocmpComparability(t *testing.T) {
@@ -51,7 +51,7 @@ func TestNocmpComparability(t *testing.T) {
 			give:       &struct{ nocmp }{},
 			comparable: true,
 		},
-
+		
 		// All exported types must be uncomparable.
 		{desc: "Bool", give: Bool{}},
 		{desc: "Duration", give: Duration{}},
@@ -64,7 +64,7 @@ func TestNocmpComparability(t *testing.T) {
 		{desc: "Uint64", give: Uint64{}},
 		{desc: "Value", give: Value{}},
 	}
-
+	
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			typ := reflect.TypeOf(tt.give)
@@ -77,16 +77,16 @@ func TestNocmpComparability(t *testing.T) {
 // nocmp must not add to the size of a struct in-memory.
 func TestNocmpSize(t *testing.T) {
 	type x struct{ _ int }
-
+	
 	before := reflect.TypeOf(x{}).Size()
-
+	
 	type y struct {
 		_ nocmp
 		_ x
 	}
-
+	
 	after := reflect.TypeOf(y{}).Size()
-
+	
 	assert.Equal(t, before, after,
 		"expected nocmp to have no effect on struct size")
 }
@@ -99,13 +99,13 @@ func TestNocmpSize(t *testing.T) {
 //	x = atomic.NewInt32(1)
 func TestNocmpCopy(t *testing.T) {
 	type foo struct{ _ nocmp }
-
+	
 	t.Run("struct copy", func(t *testing.T) {
 		a := foo{}
 		b := a
 		_ = b // unused
 	})
-
+	
 	t.Run("pointer copy", func(t *testing.T) {
 		a := &foo{}
 		b := *a
@@ -134,22 +134,22 @@ func shouldNotCompile() {
 
 func TestNocmpIntegration(t *testing.T) {
 	tempdir := t.TempDir()
-
+	
 	nocmp, err := os.ReadFile("nocmp.go")
 	require.NoError(t, err, "unable to read nocmp.go")
-
+	
 	require.NoError(t,
 		os.WriteFile(filepath.Join(tempdir, "go.mod"), []byte(_exampleGoMod), 0o644),
 		"unable to write go.mod")
-
+	
 	require.NoError(t,
 		os.WriteFile(filepath.Join(tempdir, "nocmp.go"), nocmp, 0o644),
 		"unable to write nocmp.go")
-
+	
 	require.NoError(t,
 		os.WriteFile(filepath.Join(tempdir, "bad.go"), []byte(_badFile), 0o644),
 		"unable to write bad.go")
-
+	
 	var stderr bytes.Buffer
 	cmd := exec.Command("go", "build")
 	cmd.Dir = tempdir
@@ -158,7 +158,7 @@ func TestNocmpIntegration(t *testing.T) {
 	cmd.Env = []string{"HOME=" + filepath.Join(tempdir, "home")}
 	cmd.Stderr = &stderr
 	require.Error(t, cmd.Run(), "bad.go must not compile")
-
+	
 	assert.Contains(t, stderr.String(),
 		"struct containing nocmp cannot be compared")
 }
